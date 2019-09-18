@@ -10,7 +10,7 @@
     "flow": "flow",
     "lint": "eslint -c .eslintrc.js '.'",
     "test": "exit 0",
-    "test:flow": "flow",
+    "test:flow": "flow check",
     "test:typescript": "tsc --noEmit",
     "tsc:sync": "npx typesync",
     "tsc": "tsc",
