@@ -39,13 +39,13 @@ function checkNativeiOSAvailable() {
  */
 export const initConnection = () =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       if (!RNIapIos) {
         return Promise.resolve();
       }
       return RNIapIos.canMakePayments();
     },
-    android: async () => {
+    android: () => {
       if (!RNIapModule) {
         return Promise.resolve();
       }
@@ -59,8 +59,8 @@ export const initConnection = () =>
  */
 export const endConnectionAndroid = () =>
   Platform.select({
-    ios: async () => Promise.resolve(),
-    android: async () => {
+    ios: () => Promise.resolve(),
+    android: () => {
       if (!RNIapModule) {
         return Promise.resolve();
       }
@@ -74,8 +74,8 @@ export const endConnectionAndroid = () =>
  */
 export const consumeAllItemsAndroid = () =>
   Platform.select({
-    ios: async () => Promise.resolve(),
-    android: async () => {
+    ios: () => Promise.resolve(),
+    android: () => {
       checkNativeAndroidAvailable();
       return RNIapModule.refreshItems();
     },
@@ -88,15 +88,13 @@ export const consumeAllItemsAndroid = () =>
  */
 export const getProducts = (skus) =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       if (!RNIapIos) {
         return [];
       }
-      return RNIapIos.getItems(skus).then((items) =>
-        items.filter((item) => item.productId),
-      );
+      return RNIapIos.getItems(skus).then((items) => items.filter((item) => item.productId));
     },
-    android: async () => {
+    android: () => {
       if (!RNIapModule) {
         return [];
       }
@@ -111,13 +109,13 @@ export const getProducts = (skus) =>
  */
 export const getSubscriptions = (skus) =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.getItems(skus).then((items) =>
         items.filter((item) => skus.includes(item.productId)),
       );
     },
-    android: async () => {
+    android: () => {
       checkNativeAndroidAvailable();
       return RNIapModule.getItemsByType(ANDROID_ITEM_TYPE_SUBSCRIPTION, skus);
     },
@@ -129,19 +127,19 @@ export const getSubscriptions = (skus) =>
  */
 export const getPurchaseHistory = () =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.getAvailableItems();
     },
-    android: async () => {
+    android: () => {
       checkNativeAndroidAvailable();
-      const products = await RNIapModule.getPurchaseHistoryByType(
-        ANDROID_ITEM_TYPE_IAP,
-      );
-      const subscriptions = await RNIapModule.getPurchaseHistoryByType(
-        ANDROID_ITEM_TYPE_SUBSCRIPTION,
-      );
-      return products.concat(subscriptions);
+      return Promise.all([
+        RNIapModule.getPurchaseHistoryByType(ANDROID_ITEM_TYPE_IAP),
+        RNIapModule.getPurchaseHistoryByType(ANDROID_ITEM_TYPE_SUBSCRIPTION),
+      ]).then((res) => {
+        const [products, subscriptions] = res;
+        return products.concat(subscriptions);
+      });
     },
   })();
 
@@ -151,19 +149,19 @@ export const getPurchaseHistory = () =>
  */
 export const getAvailablePurchases = () =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.getAvailableItems();
     },
-    android: async () => {
+    android: () => {
       checkNativeAndroidAvailable();
-      const products = await RNIapModule.getAvailableItemsByType(
-        ANDROID_ITEM_TYPE_IAP,
-      );
-      const subscriptions = await RNIapModule.getAvailableItemsByType(
-        ANDROID_ITEM_TYPE_SUBSCRIPTION,
-      );
-      return products.concat(subscriptions);
+      return Promise.all([
+        RNIapModule.getAvailableItemsByType(ANDROID_ITEM_TYPE_IAP),
+        RNIapModule.getAvailableItemsByType(ANDROID_ITEM_TYPE_SUBSCRIPTION),
+      ]).then((res) => {
+        const [products, subscriptions] = res;
+        return products.concat(subscriptions);
+      });
     },
   })();
 
@@ -261,7 +259,7 @@ export const requestSubscription = (
  */
 export const requestPurchaseWithQuantityIOS = (sku, quantity) =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       RNIapIos.buyProductWithQuantityIOS(sku, quantity);
     },
@@ -277,7 +275,7 @@ export const requestPurchaseWithQuantityIOS = (sku, quantity) =>
  */
 export const finishTransactionIOS = (transactionId) => {
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.finishTransaction(transactionId);
     },
@@ -298,21 +296,15 @@ export const finishTransaction = (
   developerPayloadAndroid,
 ) => {
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.finishTransaction(transactionId);
     },
-    android: async () => {
+    android: () => {
       if (isConsumable) {
-        return RNIapModule.consumePurchaseAndroid(
-          transactionId,
-          developerPayloadAndroid,
-        );
+        return RNIapModule.consumePurchaseAndroid(transactionId, developerPayloadAndroid);
       }
-      return RNIapModule.acknowledgePurchaseAndroid(
-        transactionId,
-        developerPayloadAndroid,
-      );
+      return RNIapModule.acknowledgePurchaseAndroid(transactionId, developerPayloadAndroid);
     },
   })();
 };
@@ -353,7 +345,7 @@ export const clearProductsIOS = () =>
  */
 export const acknowledgePurchaseAndroid = (token, developerPayload) =>
   Platform.select({
-    android: async () => {
+    android: () => {
       checkNativeAndroidAvailable();
       return RNIapModule.acknowledgePurchase(token, developerPayload);
     },
@@ -366,7 +358,7 @@ export const acknowledgePurchaseAndroid = (token, developerPayload) =>
  */
 export const consumePurchaseAndroid = (token, developerPayload) =>
   Platform.select({
-    android: async () => {
+    android: () => {
       checkNativeAndroidAvailable();
       return RNIapModule.consumeProduct(token, developerPayload);
     },
@@ -379,7 +371,7 @@ export const consumePurchaseAndroid = (token, developerPayload) =>
  */
 export const getPromotedProductIOS = () =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.promotedProduct();
     },
@@ -392,7 +384,7 @@ export const getPromotedProductIOS = () =>
  */
 export const buyPromotedProductIOS = () =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.buyPromotedProduct();
     },
@@ -415,7 +407,7 @@ export const buyPromotedProductIOS = () =>
  */
 export const requestPurchaseWithOfferIOS = (sku, forUser, withOffer) =>
   Platform.select({
-    ios: async () => {
+    ios: () => {
       checkNativeiOSAvailable();
       return RNIapIos.buyProductWithOffer(sku, forUser, withOffer);
     },
@@ -427,27 +419,23 @@ export const requestPurchaseWithOfferIOS = (sku, forUser, withOffer) =>
  * @param {string} isTest whether this is in test environment which is sandbox.
  * @returns {Promise<object>}
  */
-export const validateReceiptIos = async (receiptBody, isTest) => {
-  const url = isTest
-    ? 'https://sandbox.itunes.apple.com/verifyReceipt'
-    : 'https://buy.itunes.apple.com/verifyReceipt';
+export const validateReceiptIos = (receiptBody, isTest) => {
+  const url = isTest ? 'https://sandbox.itunes.apple.com/verifyReceipt' : 'https://buy.itunes.apple.com/verifyReceipt';
 
-  const response = await fetch(url, {
+  return fetch(url, {
     method: 'POST',
     headers: new Headers({
       Accept: 'application/json',
       'Content-Type': 'application/json',
     }),
     body: JSON.stringify(receiptBody),
+  }).then((response) => {
+    if (!response.ok) {
+      throw Object.assign(new Error(response.statusText), { statusCode: response.status });
+    }
+
+    return response.json();
   });
-
-  if (!response.ok) {
-    throw Object.assign(new Error(response.statusText), {
-      statusCode: response.status,
-    });
-  }
-
-  return response.json();
 };
 
 /**
@@ -459,28 +447,22 @@ export const validateReceiptIos = async (receiptBody, isTest) => {
  * @param {boolean} isSub whether this is subscription or inapp. `true` for subscription.
  * @returns {Promise<object>}
  */
-export const validateReceiptAndroid = async (
-  packageName,
-  productId,
-  productToken,
-  accessToken,
-  isSub,
-) => {
+export const validateReceiptAndroid = (packageName, productId, productToken, accessToken, isSub) => {
   const type = isSub ? 'subscriptions' : 'products';
   const url = `https://www.googleapis.com/androidpublisher/v2/applications/${packageName}/purchases/${type}/${productId}/tokens/${productToken}?access_token=${accessToken}`;
 
-  const response = await fetch(url, {
+  return fetch(url, {
     method: 'GET',
     headers: new Headers({ Accept: 'application/json' }),
+  }).then((response) => {
+    if (!response.ok) {
+      throw Object.assign(new Error(response.statusText), {
+        statusCode: response.status,
+      });
+    }
+
+    return response.json();
   });
-
-  if (!response.ok) {
-    throw Object.assign(new Error(response.statusText), {
-      statusCode: response.status,
-    });
-  }
-
-  return response.json();
 };
 
 /**
@@ -493,10 +475,7 @@ export const purchaseUpdatedListener = (e) => {
     const myModuleEvt = new NativeEventEmitter(RNIapIos);
     return myModuleEvt.addListener('purchase-updated', e);
   } else {
-    const emitterSubscription = DeviceEventEmitter.addListener(
-      'purchase-updated',
-      e,
-    );
+    const emitterSubscription = DeviceEventEmitter.addListener('purchase-updated', e);
     RNIapModule.startListening();
     return emitterSubscription;
   }
