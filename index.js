@@ -9,8 +9,6 @@ const { RNIapIos, RNIapModule } = NativeModules;
 
 const ANDROID_ITEM_TYPE_SUBSCRIPTION = 'subs';
 const ANDROID_ITEM_TYPE_IAP = 'inapp';
-const IOS_ITEM_TYPE_SUBSCRIPTION = 'sub';
-const IOS_ITEM_TYPE_IAP = 'iap';
 
 export const PROMOTED_PRODUCT = 'iap-promoted-product';
 
