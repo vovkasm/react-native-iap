@@ -4,7 +4,6 @@
   "description": "React Native In App Purchase Module.",
   "main": "index.js",
   "types": "index.d.ts",
-  "postinstall": "dooboolab-welcome postinstall",
   "scripts": {
     "eslint": "eslint",
     "flow": "flow",
@@ -31,9 +30,6 @@
   "peerDependencies": {
     "react": "*",
     "react-native": ">=0.54"
-  },
-  "dependencies": {
-    "dooboolab-welcome": "^1.1.1"
   },
   "devDependencies": {
     "@types/eslint": "^6.1.0",
