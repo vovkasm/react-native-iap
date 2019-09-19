@@ -208,7 +208,7 @@ RCT_EXPORT_METHOD(buyProductWithOffer:(NSString*)sku
 }
 
 RCT_EXPORT_METHOD(buyProductWithQuantityIOS:(NSString*)sku
-                  quantity:(NSInteger*)quantity
+                  quantity:(NSInteger)quantity
                   resolve:(RCTPromiseResolveBlock)resolve
                   reject:(RCTPromiseRejectBlock)reject) {
     NSLog(@"\n\n\n  buyProductWithQuantityIOS  \n\n.");
@@ -382,7 +382,8 @@ RCT_EXPORT_METHOD(getPendingTransactions:(RCTPromiseResolveBlock)resolve
                 [[SKPaymentQueue defaultQueue] finishTransaction:transaction];
                 NSString *key = RCTKeyForInstance(transaction.payment.productIdentifier);
                 dispatch_sync(myQueue, ^{
-                    if (hasListeners) {
+                    if (self == nil) return;
+                    if (self->hasListeners) {
                         NSString *responseCode = [@(transaction.error.code) stringValue];
                         NSDictionary *err = [NSDictionary dictionaryWithObjectsAndKeys:
                                              responseCode, @"responseCode",
@@ -445,7 +446,7 @@ RCT_EXPORT_METHOD(getPendingTransactions:(RCTPromiseResolveBlock)resolve
         [self resolvePromisesForKey:RCTKeyForInstance(transaction.payment.productIdentifier) value:purchase];
         
         // additionally send event
-        if (hasListeners) {
+        if (self->hasListeners) {
             [self sendEventWithName:@"purchase-updated" body: purchase];
         }
     }];
