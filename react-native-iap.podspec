@@ -2,7 +2,7 @@ require 'json'
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
-  s.name         = "RNIap"
+  s.name         = "react-native-iap"
   s.version      = package['version']
   s.summary      = package['description']
   s.homepage     = "https://github.com/dooboolab/react-native-iap"
