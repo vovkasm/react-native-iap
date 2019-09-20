@@ -2,7 +2,7 @@ import { EmitterSubscription } from 'react-native';
 
 import * as Apple from './apple';
 
-interface ID extends string {}
+type ID = string
 
 interface Common {
   title: string;
@@ -378,15 +378,15 @@ export function validateReceiptAndroid(
 
 /**
  * Subscribe a listener when purchase is updated.
- * @returns {callback(e: ProductPurchase)}
+ * @param cb callback that called with with {@link ProductPurchase} as first argument
  */
-export function purchaseUpdatedListener(fn: Function): EmitterSubscription;
+export function purchaseUpdatedListener(cb: (e: ProductPurchase) => any): EmitterSubscription;
 
 /**
  * Subscribe a listener when purchase got error.
- * @returns {callback(e: PurchaseError)}
+ * @param cb callback that called with with {@link PurchaseError} as first argument
  */
-export function purchaseErrorListener(fn: Function): EmitterSubscription;
+export function purchaseErrorListener(cb: (e: PurchaseError) => any): EmitterSubscription;
 
 /**
  * Request current receipt base64 encoded (IOS only)
