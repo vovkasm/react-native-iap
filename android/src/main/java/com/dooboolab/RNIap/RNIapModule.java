@@ -2,47 +2,47 @@
 package com.dooboolab.RNIap;
 
 import android.app.Activity;
-import androidx.annotation.Nullable;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ConsumeParams;
+import com.android.billingclient.api.ConsumeResponseListener;
+import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchaseHistoryRecord;
+import com.android.billingclient.api.PurchaseHistoryResponseListener;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsParams;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
+import com.facebook.react.bridge.ObjectAlreadyConsumedException;
+import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Promise;
-import com.facebook.react.bridge.ObjectAlreadyConsumedException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.ConsumeResponseListener;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchaseHistoryResponseListener;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.AcknowledgePurchaseParams;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
 import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class RNIapModule extends ReactContextBaseJavaModule implements PurchasesUpdatedListener{
-  final String TAG = "RNIapModule";
+  private final String TAG = "RNIapModule";
 
   private static final String PROMISE_BUY_ITEM = "PROMISE_BUY_ITEM";
 
@@ -76,12 +76,12 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
   public RNIapModule(ReactApplicationContext reactContext) {
     super(reactContext);
     this.reactContext = reactContext;
-    this.skus = new ArrayList<SkuDetails>();
+    this.skus = new ArrayList<>();
     reactContext.addLifecycleEventListener(lifecycleEventListener);
   }
 
   @Override
-  public String getName() {
+  public @NonNull String getName() {
     return "RNIapModule";
   }
 
@@ -366,7 +366,7 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
     final String type,
     final String sku,
     final String oldSku,
-    final Integer prorationMode,
+    final int prorationMode,
     final String developerId,
     final String accountId,
     final Promise promise
@@ -386,7 +386,7 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
 
         if (type.equals(BillingClient.SkuType.SUBS) && oldSku != null && !oldSku.isEmpty()) {
           // Subscription upgrade/downgrade
-          if (prorationMode != null && prorationMode != -1) {
+          if (prorationMode != -1) {
             builder.setOldSku(oldSku);
             if (prorationMode == BillingFlowParams.ProrationMode.IMMEDIATE_AND_CHARGE_PRORATED_PRICE) {
               builder.setReplaceSkusProrationMode(BillingFlowParams.ProrationMode.IMMEDIATE_AND_CHARGE_PRORATED_PRICE);
