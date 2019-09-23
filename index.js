@@ -301,10 +301,11 @@ export const finishTransaction = (
       return RNIapIos.finishTransaction(transactionId);
     },
     android: () => {
+      checkNativeAndroidAvailable();
       if (isConsumable) {
-        return RNIapModule.consumePurchaseAndroid(transactionId, developerPayloadAndroid);
+        return RNIapModule.consumeProduct(transactionId, developerPayloadAndroid);
       }
-      return RNIapModule.acknowledgePurchaseAndroid(transactionId, developerPayloadAndroid);
+      return RNIapModule.acknowledgePurchase(transactionId, developerPayloadAndroid);
     },
   })();
 };

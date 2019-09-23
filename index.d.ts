@@ -345,10 +345,7 @@ export function acknowledgePurchaseAndroid(
  * @param {string} developerPayload Developer payload (on Android)
  * @returns {Promise}
  */
-export function consumePurchaseAndroid(
-  token: string,
-  developerPayload?: string,
-): Promise<PurchaseResult>;
+export function consumePurchaseAndroid(token: string, developerPayload?: string): Promise<PurchaseResult>;
 
 /**
  * Validate receipt for iOS.
