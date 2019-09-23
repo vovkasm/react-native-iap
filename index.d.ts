@@ -49,10 +49,12 @@ export interface Subscription<ID> extends Common {
 
 export interface ProductPurchase {
   productId: string;
-  transactionId?: string;
+  /** Unique identifier of transaction (transactionId on iOS and purchaseToken on Android) */
+  transactionId: string;
   transactionDate: number;
   transactionReceipt: string;
-  purchaseToken?: string;
+  /** (Android only) A unique order identifier for the transaction. This identifier corresponds to the Google payments order ID. */
+  orderIdAndroid?: string;
   dataAndroid?: string;
   signatureAndroid?: string;
   autoRenewingAndroid?: boolean;

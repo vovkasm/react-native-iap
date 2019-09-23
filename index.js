@@ -341,27 +341,27 @@ export const clearProductsIOS = () =>
 
 /**
  * Acknowledge a product (on Android.) No-op on iOS.
- * @param {string} token The product's token (on Android)
+ * @param {string} transactionId The product's transactionId (token on Android)
  * @returns {Promise}
  */
-export const acknowledgePurchaseAndroid = (token, developerPayload) =>
+export const acknowledgePurchaseAndroid = (transactionId, developerPayload) =>
   Platform.select({
     android: () => {
       checkNativeAndroidAvailable();
-      return RNIapModule.acknowledgePurchase(token, developerPayload);
+      return RNIapModule.acknowledgePurchase(transactionId, developerPayload);
     },
   })();
 
 /**
  * Consume a product (on Android.) No-op on iOS.
- * @param {string} token The product's token (on Android)
+ * @param {string} transactionId The product's transactionId (token on Android)
  * @returns {Promise}
  */
-export const consumePurchaseAndroid = (token, developerPayload) =>
+export const consumePurchaseAndroid = (transactionId, developerPayload) =>
   Platform.select({
     android: () => {
       checkNativeAndroidAvailable();
-      return RNIapModule.consumeProduct(token, developerPayload);
+      return RNIapModule.consumeProduct(transactionId, developerPayload);
     },
   })();
 

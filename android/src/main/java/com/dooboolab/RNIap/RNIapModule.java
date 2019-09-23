@@ -46,8 +46,6 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
 
   private static final String PROMISE_BUY_ITEM = "PROMISE_BUY_ITEM";
 
-  private HashMap<String, ArrayList<Promise>> promises = new HashMap<>();
-
   private ReactContext reactContext;
   private BillingClient billingClient;
 
@@ -293,23 +291,7 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
 
         if (purchases != null) {
           for (Purchase purchase : purchases) {
-            WritableNativeMap item = new WritableNativeMap();
-            item.putString("productId", purchase.getSku());
-            item.putString("transactionId", purchase.getOrderId());
-            item.putDouble("transactionDate", purchase.getPurchaseTime());
-            item.putString("transactionReceipt", purchase.getOriginalJson());
-            item.putString("orderId", purchase.getOrderId());
-            item.putString("purchaseToken", purchase.getPurchaseToken());
-            item.putString("developerPayloadAndroid", purchase.getDeveloperPayload());
-            item.putString("signatureAndroid", purchase.getSignature());
-            item.putInt("purchaseStateAndroid", purchase.getPurchaseState());
-
-            if (type.equals(BillingClient.SkuType.INAPP)) {
-              item.putBoolean("isAcknowledgedAndroid", purchase.isAcknowledged());
-            } else if (type.equals(BillingClient.SkuType.SUBS)) {
-              item.putBoolean("autoRenewingAndroid", purchase.isAutoRenewing());
-            }
-            items.pushMap(item);
+            items.pushMap(encodePurchase(purchase));
           }
         }
 
@@ -341,9 +323,9 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
             for (PurchaseHistoryRecord purchase : purchaseHistoryRecordList) {
               WritableMap item = Arguments.createMap();
               item.putString("productId", purchase.getSku());
+              item.putString("transactionId", purchase.getPurchaseToken());
               item.putDouble("transactionDate", purchase.getPurchaseTime());
               item.putString("transactionReceipt", purchase.getOriginalJson());
-              item.putString("purchaseToken", purchase.getPurchaseToken());
               item.putString("dataAndroid", purchase.getOriginalJson());
               item.putString("signatureAndroid", purchase.getSignature());
               item.putString("developerPayload", purchase.getDeveloperPayload());
@@ -507,20 +489,7 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
 
     if (purchases != null) {
       for (Purchase purchase : purchases) {
-
-        WritableMap item = Arguments.createMap();
-        item.putString("productId", purchase.getSku());
-        item.putString("transactionId", purchase.getOrderId());
-        item.putDouble("transactionDate", purchase.getPurchaseTime());
-        item.putString("transactionReceipt", purchase.getOriginalJson());
-        item.putString("purchaseToken", purchase.getPurchaseToken());
-        item.putString("dataAndroid", purchase.getOriginalJson());
-        item.putString("signatureAndroid", purchase.getSignature());
-        item.putBoolean("autoRenewingAndroid", purchase.isAutoRenewing());
-        item.putBoolean("isAcknowledgedAndroid", purchase.isAcknowledged());
-        item.putInt("purchaseStateAndroid", purchase.getPurchaseState());
-
-        sendEvent(reactContext, "purchase-updated", item);
+        sendEvent(reactContext, "purchase-updated", encodePurchase(purchase));
       }
     } else {
       WritableMap error = Arguments.createMap();
@@ -563,5 +532,21 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
     reactContext
         .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
         .emit(eventName, params);
+  }
+
+  private WritableNativeMap encodePurchase(@NonNull Purchase purchase) {
+    WritableNativeMap item = new WritableNativeMap();
+    item.putString("orderIdAndroid", purchase.getOrderId());
+    item.putString("productId", purchase.getSku());
+    item.putString("transactionId", purchase.getPurchaseToken());
+    item.putDouble("transactionDate", purchase.getPurchaseTime());
+    item.putString("transactionReceipt", purchase.getOriginalJson());
+    String developerPayload = purchase.getDeveloperPayload();
+    if (developerPayload != null) item.putString("developerPayloadAndroid", developerPayload);
+    item.putString("signatureAndroid", purchase.getSignature());
+    item.putBoolean("autoRenewingAndroid", purchase.isAutoRenewing());
+    item.putBoolean("isAcknowledgedAndroid", purchase.isAcknowledged());
+    item.putInt("purchaseStateAndroid", purchase.getPurchaseState());
+    return item;
   }
 }
