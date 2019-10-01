@@ -518,40 +518,6 @@ export const getPendingPurchasesIOS = () => {
   }
 };
 
-/**
- * deprecated codes
- */
-/*
-export const validateReceiptIos = async (receiptBody, isTest) => {
-  if (Platform.OS === 'ios') {
-    const URL = isTest ? 'https://sandbox.itunes.apple.com/verifyReceipt' : 'https://buy.itunes.apple.com/verifyReceipt';
-    try {
-      let res = await fetch(URL, {
-        method: 'POST',
-        headers: new Headers({
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        }),
-        body: JSON.stringify(receiptBody),
-      });
-
-      if (res) {
-        const json = await res.text();
-        res = JSON.parse(json);
-        return res;
-      }
-
-      return false;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-  }
-
-  return response.json();
-};
-*/
-
 export default {
   initConnection,
   endConnectionAndroid,
